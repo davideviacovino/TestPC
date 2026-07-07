@@ -22,11 +22,14 @@ Get-WindowsUpdate -MicrosoftUpdate -AcceptAll -Install -IgnoreReboot -Verbose
 Write-Host ""
 Write-Host "=== Aggiornamento completato ===" -ForegroundColor Green
 
-# Riavvio se richiesto da un aggiornamento (facoltativo, commenta se non vuoi il riavvio automatico)
+# NOTA: il riavvio NON viene eseguito automaticamente qui.
+# Un riavvio a questo punto interromperebbe pc_test.exe a meta' del collaudo,
+# impedendo la generazione del report finale. Il riavvio va fatto manualmente
+# dall'operatore SOLO dopo che il collaudo completo (incluso il report TXT) e' terminato.
 if (Get-WURebootStatus -Silent) {
-    Write-Host "E' richiesto un riavvio per completare l'installazione." -ForegroundColor Yellow
-    $risposta = Read-Host "Riavviare ora? (S/N)"
-    if ($risposta -match '^[Ss]') {
-        Restart-Computer -Force
-    }
+    Write-Host ""
+    Write-Host "============================================================" -ForegroundColor Yellow
+    Write-Host "RIAVVIO RICHIESTO PER COMPLETARE L'INSTALLAZIONE" -ForegroundColor Yellow
+    Write-Host "Riavviare il PC manualmente al termine dell'intero collaudo." -ForegroundColor Yellow
+    Write-Host "============================================================" -ForegroundColor Yellow
 }
