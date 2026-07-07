@@ -1,11 +1,3 @@
-/* pc_test.c
- * Orchestratore test PC: registra operatore, lancia i 3 BAT in sequenza,
- * raccoglie i risultati e genera un report TXT finale strutturato in:
- * STATO SOFTWARE / STATO HARDWARE / STATO PERIFERICHE
- * Compilazione (MinGW):  gcc pc_test.c -o pc_test.exe
- * Compilazione (MSVC):   cl pc_test.c
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +12,8 @@
 
 typedef struct {
     const char *nome;
-    char stato[3]; /* "OK" o "KO" */
+    char stato[3];     /* "OK" o "KO" */
+    char note[128];    /* descrizione del problema, se KO */
 } Periferica;
 
 void get_exe_dir(char *dir, size_t size, const char *argv0) {
@@ -84,7 +77,7 @@ int main(int argc, char *argv[]) {
     char path_bat1[MAX_PATH_LEN], path_bat2[MAX_PATH_LEN], path_bat3[MAX_PATH_LEN];
     char path_log[MAX_PATH_LEN], path_report[MAX_PATH_LEN];
     char log_content[MAX_LOG_SIZE];
-    char difetti[2048] = "";
+    char difetti[4096] = "";
     time_t now;
     struct tm *tm_info;
     char data_str[64];
@@ -138,8 +131,8 @@ int main(int argc, char *argv[]) {
     esegui_bat(path_bat2);
 
     Periferica periferiche[] = {
-        {"WiFi", ""}, {"Webcam", ""}, {"Microfono", ""}, {"Schermo (LCD)", ""},
-        {"Tastiera", ""}, {"Trackpad", ""}, {"Mouse", ""}, {"Audio", ""}
+        {"WiFi", "", ""}, {"Webcam", "", ""}, {"Microfono", "", ""}, {"Schermo (LCD)", "", ""},
+        {"Tastiera", "", ""}, {"Trackpad", "", ""}, {"Mouse", "", ""}, {"Audio", "", ""}
     };
     int n_periferiche = sizeof(periferiche) / sizeof(periferiche[0]);
 
@@ -153,11 +146,32 @@ int main(int argc, char *argv[]) {
 
         if (toupper((unsigned char)risposta[0]) == 'O') {
             strcpy(periferiche[i].stato, "OK");
+            periferiche[i].note[0] = '\0';
         } else {
             strcpy(periferiche[i].stato, "KO");
-            char buf[64];
-            snprintf(buf, sizeof(buf), "%s DIFETTOSO/A\n", periferiche[i].nome);
-            for (char *c = buf; *c; c++) *c = toupper((unsigned char)*c);
+
+            char descrizione[128];
+            printf("    -> Descrivi il problema riscontrato: ");
+            fgets(descrizione, sizeof(descrizione), stdin);
+            descrizione[strcspn(descrizione, "\n")] = '\0';
+            if (strlen(descrizione) == 0) {
+                strcpy(descrizione, "Nessuna descrizione fornita");
+            }
+            strncpy(periferiche[i].note, descrizione, sizeof(periferiche[i].note) - 1);
+            periferiche[i].note[sizeof(periferiche[i].note) - 1] = '\0';
+
+            char nome_maiusc[64];
+            strncpy(nome_maiusc, periferiche[i].nome, sizeof(nome_maiusc) - 1);
+            nome_maiusc[sizeof(nome_maiusc) - 1] = '\0';
+            for (char *c = nome_maiusc; *c; c++) *c = toupper((unsigned char)*c);
+
+            char note_maiusc[128];
+            strncpy(note_maiusc, descrizione, sizeof(note_maiusc) - 1);
+            note_maiusc[sizeof(note_maiusc) - 1] = '\0';
+            for (char *c = note_maiusc; *c; c++) *c = toupper((unsigned char)*c);
+
+            char buf[256];
+            snprintf(buf, sizeof(buf), "%s DIFETTOSO/A - %s\n", nome_maiusc, note_maiusc);
             strcat(difetti, buf);
         }
     }
@@ -210,7 +224,11 @@ int main(int argc, char *argv[]) {
     fprintf(report, "STATO PERIFERICHE\n");
     fprintf(report, "==========================================\n");
     for (int i = 0; i < n_periferiche; i++) {
-        fprintf(report, "%-16s: %s\n", periferiche[i].nome, periferiche[i].stato);
+        if (strcmp(periferiche[i].stato, "KO") == 0) {
+            fprintf(report, "%-16s: %s - %s\n", periferiche[i].nome, periferiche[i].stato, periferiche[i].note);
+        } else {
+            fprintf(report, "%-16s: %s\n", periferiche[i].nome, periferiche[i].stato);
+        }
     }
 
     fprintf(report, "\n==========================================\n");
