@@ -122,9 +122,9 @@ int main(int argc, char *argv[]) {
     printf("Risultato Salute SSD: %d%%\n", ssd_pct);
 
     if (batteria_pct == -1 || batteria_pct < SOGLIA_BATTERIA)
-        strcat(difetti, "BATTERIA (STATO INFERIORE A 80%% O NON RILEVATA)\n");
+        strcat(difetti, "BATTERIA (STATO INFERIORE A 80% O NON RILEVATA)\n");
     if (ssd_pct == -1 || ssd_pct < SOGLIA_SSD)
-        strcat(difetti, "SSD (SALUTE INFERIORE A 75%% O NON RILEVATA)\n");
+        strcat(difetti, "SSD (SALUTE INFERIORE A 75% O NON RILEVATA)\n");
 
     /* ---------- STEP 2: Test periferiche ---------- */
     printf("\n[2/3] Avvio peripheral_test.bat (test manuale periferiche)...\n");
