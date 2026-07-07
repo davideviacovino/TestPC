@@ -1,0 +1,1 @@
+Eseguire i file .bat per eseguire i test.
