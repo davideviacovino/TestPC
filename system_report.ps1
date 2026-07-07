@@ -183,7 +183,7 @@ try {
             if ($null -ne $reliability.Wear) {
                 $ssdHealth = 100 - $reliability.Wear
                 $wearLine = " | Salute SSD: $ssdHealth%"
-                if ($ssdHealth -lt 80) {
+                if ($ssdHealth -lt 75) {
                     $wearLine += " - DA SOSTITUIRE"
                 }
             }
