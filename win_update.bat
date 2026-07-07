@@ -4,7 +4,7 @@
 net session >nul 2>&1
 if %errorlevel% neq 0 (
     echo Richiesta permessi di amministratore...
-    powershell -Command "Start-Process '%~f0' -Verb RunAs"
+    powershell -Command "Start-Process '%~f0' -Verb RunAs -Wait"
     exit /b
 )
 
