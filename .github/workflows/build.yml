@@ -1,0 +1,24 @@
+name: Build Windows Exe
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Permette anche l'avvio manuale del processo
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout codice
+      uses: actions/checkout@v4
+
+    - name: Compilazione C (GCC)
+      run: |
+        gcc -std=c99 -o CollaudoPC.exe main.c
+
+    - name: Carica l'eseguibile negli Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CollaudoPC-Windows
+        path: CollaudoPC.exe
